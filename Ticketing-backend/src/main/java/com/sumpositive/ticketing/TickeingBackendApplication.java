@@ -1,0 +1,13 @@
+package com.sumpositive.ticketing;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class TickeingBackendApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(TickeingBackendApplication.class, args);
+	}
+
+}
