@@ -9,6 +9,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
-    long countByStatus(TicketStatus status);
-    long countByPriority(TicketPriority priority);
+    
+    // User-scoped status counts
+    long countByCreatorIdAndStatus(Long creatorId, TicketStatus status);
+    
+    // User-scoped priority counts
+    long countByCreatorIdAndPriority(Long creatorId, TicketPriority priority);
 }
