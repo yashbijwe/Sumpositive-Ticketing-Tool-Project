@@ -31,14 +31,22 @@ public class TicketService {
         this.ticketMapper = ticketMapper;
     }
 
+    private User getAuthenticatedUser(String currentUserEmail) {
+        return userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentUserEmail));
+    }
+
     @Transactional
-    public TicketResponseDTO createTicket(CreateTicketRequestDTO request) {
+    public TicketResponseDTO createTicket(CreateTicketRequestDTO request, String currentUserEmail) {
+        User currentUser = getAuthenticatedUser(currentUserEmail);
+
         Ticket ticket = new Ticket();
         ticket.setTitle(request.title().trim());
         ticket.setDescription(request.description() != null ? request.description().trim() : null);
         ticket.setStatus(request.status() != null ? request.status() : TicketStatus.TO_DO);
         ticket.setPriority(request.priority() != null ? request.priority() : TicketPriority.MEDIUM);
         ticket.setDueDate(request.dueDate());
+        ticket.setCreator(currentUser); // Associate with logged in user
 
         if (request.assigneeId() != null) {
             User assignee = userRepository.findById(request.assigneeId())
@@ -51,9 +59,16 @@ public class TicketService {
     }
 
     @Transactional(readOnly = true)
-    public List<TicketResponseDTO> getTickets(TicketStatus status, TicketPriority priority, Long assigneeId) {
+    public List<TicketResponseDTO> getTickets(TicketStatus status, TicketPriority priority, Long assigneeId, String currentUserEmail) {
+        User currentUser = getAuthenticatedUser(currentUserEmail);
+
         Specification<Ticket> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            // Show tickets where current user is either the creator OR the assignee
+            Predicate isCreator = cb.equal(root.get("creator").get("id"), currentUser.getId());
+            Predicate isAssignee = cb.equal(root.get("assignee").get("id"), currentUser.getId());
+            predicates.add(cb.or(isCreator, isAssignee));
 
             if (status != null) {
                 predicates.add(cb.equal(root.get("status"), status));
@@ -75,16 +90,22 @@ public class TicketService {
     }
 
     @Transactional(readOnly = true)
-    public TicketResponseDTO getTicketById(Long id) {
+    public TicketResponseDTO getTicketById(Long id, String currentUserEmail) {
+        User currentUser = getAuthenticatedUser(currentUserEmail);
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
+
+        validateOwnership(ticket, currentUser);
         return ticketMapper.toResponseDTO(ticket);
     }
 
     @Transactional
-    public TicketResponseDTO updateTicket(Long id, UpdateTicketRequestDTO request) {
+    public TicketResponseDTO updateTicket(Long id, UpdateTicketRequestDTO request, String currentUserEmail) {
+        User currentUser = getAuthenticatedUser(currentUserEmail);
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
+
+        validateOwnership(ticket, currentUser);
 
         ticket.setTitle(request.title().trim());
         ticket.setDescription(request.description() != null ? request.description().trim() : null);
@@ -97,7 +118,7 @@ public class TicketService {
                     .orElseThrow(() -> new ValidationException("Assignee not found with ID: " + request.assigneeId()));
             ticket.setAssignee(assignee);
         } else {
-            ticket.setAssignee(null); // Clear assignment (TICK-05)
+            ticket.setAssignee(null);
         }
 
         Ticket updatedTicket = ticketRepository.save(ticket);
@@ -105,9 +126,12 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketResponseDTO updateTicketStatus(Long id, UpdateStatusRequestDTO request) {
+    public TicketResponseDTO updateTicketStatus(Long id, UpdateStatusRequestDTO request, String currentUserEmail) {
+        User currentUser = getAuthenticatedUser(currentUserEmail);
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
+
+        validateOwnership(ticket, currentUser);
 
         ticket.setStatus(request.status());
         Ticket updatedTicket = ticketRepository.save(ticket);
@@ -115,9 +139,21 @@ public class TicketService {
     }
 
     @Transactional
-    public void deleteTicket(Long id) {
+    public void deleteTicket(Long id, String currentUserEmail) {
+        User currentUser = getAuthenticatedUser(currentUserEmail);
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
+
+        validateOwnership(ticket, currentUser);
         ticketRepository.delete(ticket);
+    }
+
+    private void validateOwnership(Ticket ticket, User currentUser) {
+        boolean isCreator = ticket.getCreator() != null && ticket.getCreator().getId().equals(currentUser.getId());
+        boolean isAssignee = ticket.getAssignee() != null && ticket.getAssignee().getId().equals(currentUser.getId());
+
+        if (!isCreator && !isAssignee) {
+            throw new ResourceNotFoundException("Ticket", ticket.getId());
+        }
     }
 }
