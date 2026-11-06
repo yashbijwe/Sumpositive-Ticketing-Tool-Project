@@ -51,6 +51,7 @@ public class AuthService {
 
         log.info("Found user in database with id: {}", user.getId());
         
+//        log.info("Fresh BCrypt Hash for '{}': {}", request.password(), passwordEncoder.encode(request.password()));
    
 
         boolean passwordMatches = passwordEncoder.matches(request.password(), user.getPasswordHash());
