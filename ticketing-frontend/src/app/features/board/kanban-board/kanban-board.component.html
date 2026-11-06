@@ -1,0 +1,89 @@
+<main class="board-page">
+  <app-workspace-header />
+  <div class="page-content">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">SEE THE BIG PICTURE</p>
+        <h1>Board</h1>
+        <p class="subheading">Move work forward, one ticket at a time.</p>
+      </div>
+      <span class="board-count"><i class="bi bi-ticket-detailed" aria-hidden="true"></i> {{ tickets.length }} tickets</span>
+    </section>
+
+    @if (errorMessage) {
+      <div class="error-banner" role="alert">
+        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+        {{ errorMessage }}
+        <button type="button" (click)="loadTickets()">Try again</button>
+      </div>
+    }
+
+    @if (isLoading) {
+      <div class="loading-state"><span class="spinner"></span> Loading your board...</div>
+    } @else {
+      <section class="board-columns" aria-label="Tickets organized by status">
+        @for (column of columns; track column.status) {
+          <div class="board-column" [class]="column.status.toLowerCase().replace('_', '-')">
+            <header class="column-header">
+              <div class="column-title">
+                <i class="bi" [class]="column.icon" aria-hidden="true"></i>
+                <h2>{{ column.title }}</h2>
+                <span class="column-count">{{ ticketsFor(column.status).length }}</span>
+              </div>
+            </header>
+
+            <div class="column-cards">
+              @for (ticket of ticketsFor(column.status); track ticket.id) {
+                <article class="ticket-card" [class.is-updating]="updatingTicketIds.has(ticket.id)">
+                  <div class="card-meta">
+                    <span class="ticket-id">#{{ ticket.id }}</span>
+                    <span class="priority-pill" [class]="priorityClass(ticket.priority)">{{ ticket.priority }}</span>
+                  </div>
+                  <h3>{{ ticket.title }}</h3>
+                  @if (ticket.description) {
+                    <p class="ticket-description">{{ ticket.description }}</p>
+                  }
+                  <footer class="card-footer">
+                    <span class="assignee">
+                      <span class="assignee-avatar">{{ ticket.assignee?.name?.slice(0, 1) ?? 'U' }}</span>
+                      {{ ticket.assignee?.name ?? 'Unassigned' }}
+                    </span>
+                    <div class="move-actions" [attr.aria-label]="'Move ' + ticket.title">
+                      @if (column.status !== 'TO_DO') {
+                        <button
+                          type="button"
+                          [disabled]="updatingTicketIds.has(ticket.id)"
+                          [attr.aria-label]="'Move to ' + statusLabel(columns[columns.indexOf(column) - 1].status)"
+                          title="Move back"
+                          (click)="move(ticket, columns[columns.indexOf(column) - 1].status)"
+                        >
+                          <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                        </button>
+                      }
+                      @if (column.status !== 'DONE') {
+                        <button
+                          type="button"
+                          [disabled]="updatingTicketIds.has(ticket.id)"
+                          [attr.aria-label]="'Move to ' + statusLabel(columns[columns.indexOf(column) + 1].status)"
+                          title="Move forward"
+                          (click)="move(ticket, columns[columns.indexOf(column) + 1].status)"
+                        >
+                          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </button>
+                      }
+                    </div>
+                  </footer>
+                </article>
+              } @empty {
+                <div class="column-empty">
+                  <i class="bi bi-inbox" aria-hidden="true"></i>
+                  <span>No tickets here</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    }
+  </div>
+</main>

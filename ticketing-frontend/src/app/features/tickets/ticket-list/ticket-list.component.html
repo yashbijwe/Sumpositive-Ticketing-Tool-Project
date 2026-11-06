@@ -1,0 +1,177 @@
+<main class="tickets-page">
+  <app-workspace-header />
+  <div class="page-content">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">YOUR WORKSPACE</p>
+        <h1>Tickets</h1>
+        <p class="subheading">Keep every task organized and moving forward.</p>
+      </div>
+      <button class="primary-button" type="button" (click)="openCreateModal()">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> New ticket
+      </button>
+    </section>
+
+    @if (errorMessage) {
+      <div class="error-banner" role="alert">
+        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+        {{ errorMessage }}
+        <button type="button" (click)="loadTickets()">Try again</button>
+      </div>
+    }
+
+    <section class="list-card">
+      <div class="list-toolbar">
+        <label class="search-box">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input
+            type="search"
+            placeholder="Search tickets..."
+            aria-label="Search tickets"
+            [value]="searchTerm"
+            (input)="updateSearch($event)"
+          />
+        </label>
+        <label class="filter-label">
+          <span>Status</span>
+          <select aria-label="Filter tickets by status" [value]="statusFilter" (change)="updateStatusFilter($event)">
+            <option value="ALL">All statuses</option>
+            <option value="TO_DO">To do</option>
+            <option value="IN_PROGRESS">In progress</option>
+            <option value="DONE">Done</option>
+          </select>
+        </label>
+        <span class="result-count">{{ filteredTickets.length }} tickets</span>
+      </div>
+
+      @if (isLoading) {
+        <div class="loading-state"><span class="spinner"></span> Loading tickets...</div>
+      } @else if (filteredTickets.length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon"><i class="bi bi-inbox" aria-hidden="true"></i></span>
+          <strong>{{ tickets.length ? 'No matching tickets' : 'No tickets yet' }}</strong>
+          <p>{{ tickets.length ? 'Try another search or status filter.' : 'Create a ticket to get your work organized.' }}</p>
+          @if (!tickets.length) {
+            <button type="button" (click)="openCreateModal()">Create your first ticket</button>
+          }
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Ticket</th>
+                <th scope="col">Status</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Due date</th>
+                <th scope="col"><span class="visually-hidden">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ticket of filteredTickets; track ticket.id) {
+                <tr>
+                  <td>
+                    <div class="ticket-title">
+                      <span class="ticket-icon"><i class="bi bi-ticket-perforated" aria-hidden="true"></i></span>
+                      <span>
+                        <strong>{{ ticket.title }}</strong>
+                        <small>#{{ ticket.id }} @if (ticket.description) { <span>·</span> {{ ticket.description }} }</small>
+                      </span>
+                    </div>
+                  </td>
+                  <td><span [class]="statusClass(ticket.status)">{{ statusLabel(ticket.status) }}</span></td>
+                  <td><span [class]="priorityClass(ticket.priority)">{{ ticket.priority }}</span></td>
+                  <td class="due-date">{{ ticket.dueDate ? (ticket.dueDate | date: 'mediumDate') : '—' }}</td>
+                  <td>
+                    <div class="row-actions">
+                      <button type="button" aria-label="Edit ticket" title="Edit ticket" (click)="openEditModal(ticket)">
+                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                      </button>
+                      <button type="button" aria-label="Delete ticket" title="Delete ticket" (click)="deleteTicket(ticket)">
+                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </div>
+
+  @if (isModalOpen) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <section
+        class="ticket-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">{{ editingTicket ? 'UPDATE YOUR WORK' : 'ADD TO YOUR WORKSPACE' }}</p>
+            <h2 id="modal-title">{{ editingTicket ? 'Edit ticket' : 'Create a ticket' }}</h2>
+          </div>
+          <button type="button" class="close-button" aria-label="Close dialog" (click)="closeModal()">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </header>
+
+        @if (modalError) {
+          <div class="error-banner modal-error" role="alert">{{ modalError }}</div>
+        }
+
+        <form [formGroup]="ticketForm" (ngSubmit)="submitTicket()">
+          <div class="form-field">
+            <label for="ticket-title">Title <span>*</span></label>
+            <input id="ticket-title" type="text" formControlName="title" maxlength="120" placeholder="What needs to be done?" />
+            @if (ticketForm.controls.title.invalid && ticketForm.controls.title.touched) {
+              <small class="field-error">
+                @if (ticketForm.controls.title.hasError('required')) { Add a title for this ticket. }
+                @else { Keep the title to 120 characters or fewer. }
+              </small>
+            }
+          </div>
+          <div class="form-field">
+            <label for="ticket-description">Description</label>
+            <textarea id="ticket-description" formControlName="description" rows="3" maxlength="1000" placeholder="Add a few details (optional)"></textarea>
+            @if (ticketForm.controls.description.invalid && ticketForm.controls.description.touched) {
+              <small class="field-error">Keep the description to 1,000 characters or fewer.</small>
+            }
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="ticket-status">Status</label>
+              <select id="ticket-status" formControlName="status">
+                @for (status of statuses; track status) {
+                  <option [value]="status">{{ statusLabel(status) }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="ticket-priority">Priority</label>
+              <select id="ticket-priority" formControlName="priority">
+                @for (priority of priorities; track priority) {
+                  <option [value]="priority">{{ priority }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="ticket-due-date">Due date</label>
+            <input id="ticket-due-date" type="date" formControlName="dueDate" />
+          </div>
+          <footer class="modal-actions">
+            <button class="cancel-button" type="button" [disabled]="isSaving" (click)="closeModal()">Cancel</button>
+            <button class="primary-button" type="submit" [disabled]="isSaving">
+              @if (isSaving) { Saving... } @else { {{ editingTicket ? 'Save changes' : 'Create ticket' }} }
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+</main>

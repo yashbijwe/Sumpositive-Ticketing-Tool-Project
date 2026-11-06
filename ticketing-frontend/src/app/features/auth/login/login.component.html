@@ -1,0 +1,121 @@
+<main class="login-page">
+  <section class="welcome-panel" aria-label="About  Ticketing">
+    <a class="brand" routerLink="/" aria-label=" Ticketing home">
+      <span class="brand-mark"><i class="bi bi-kanban-fill" aria-hidden="true"></i></span>
+      <span>Ticketing<span class="brand-light"> Tool</span></span>
+    </a>
+
+    <div class="welcome-copy">
+      <span class="eyebrow"><span class="eyebrow-dot"></span> TEAMWORK, IN FLOW</span>
+      <h1>Make work<br />move forward.</h1>
+      <p>One clear place for your team to track what matters and get great work done.</p>
+    </div>
+
+  </section>
+
+  <section class="form-panel">
+    <div class="mobile-brand" aria-hidden="true">
+      <span class="brand-mark"><i class="bi bi-kanban-fill"></i></span>
+      <span>Ticketing<span class="brand-light"> Tool</span></span>
+    </div>
+
+    <div class="login-card">
+      <div class="form-intro">
+        <span class="eyebrow form-eyebrow">WELCOME BACK</span>
+        <h2>Sign in to your account</h2>
+        <p>Enter your details below to continue to your workspace.</p>
+      </div>
+
+      <div class="error-message" role="alert" [hidden]="!errorMessage">
+        <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+        <div class="field-group">
+          <label for="email">Work email</label>
+          <div
+            class="input-wrap"
+            [class.input-invalid]="loginForm.controls.email.invalid && loginForm.controls.email.touched"
+          >
+            <i class="bi bi-envelope" aria-hidden="true"></i>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="you@company.com"
+              autocomplete="username"
+              [attr.aria-invalid]="loginForm.controls.email.invalid && loginForm.controls.email.touched"
+              [attr.aria-describedby]="
+                loginForm.controls.email.invalid && loginForm.controls.email.touched
+                  ? 'email-error'
+                  : null
+              "
+            />
+          </div>
+          @if (loginForm.controls.email.invalid && loginForm.controls.email.touched) {
+            <span class="field-error" id="email-error">
+              @if (loginForm.controls.email.hasError('required')) {
+                Please enter your work email.
+              } @else {
+                Enter a valid email address.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="field-group">
+          <div class="label-row">
+            <label for="password">Password</label>
+          </div>
+          <div
+            class="input-wrap"
+            [class.input-invalid]="loginForm.controls.password.invalid && loginForm.controls.password.touched"
+          >
+            <i class="bi bi-lock" aria-hidden="true"></i>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              [attr.aria-invalid]="loginForm.controls.password.invalid && loginForm.controls.password.touched"
+              [attr.aria-describedby]="
+                loginForm.controls.password.invalid && loginForm.controls.password.touched
+                  ? 'password-error'
+                  : null
+              "
+            />
+            <button
+              class="password-toggle"
+              type="button"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" aria-hidden="true"></i>
+            </button>
+          </div>
+          @if (loginForm.controls.password.invalid && loginForm.controls.password.touched) {
+            <span class="field-error" id="password-error">Please enter your password.</span>
+          }
+        </div>
+
+        <button class="submit-button" type="submit" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <span class="spinner" aria-hidden="true"></span>
+            Signing in...
+          } @else {
+            Sign in <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          }
+        </button>
+      </form>
+
+      <p class="secure-note">
+        <i class="bi bi-shield-check" aria-hidden="true"></i>
+        Your workspace is private and secure.
+      </p>
+    </div>
+
+    <p class="copyright">© 2026. Built for better work.</p>
+  </section>
+</main>
