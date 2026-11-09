@@ -47,3 +47,21 @@ td { height: 62px; padding: 8px 18px; border-top: 1px solid #edf0f4; color: #627
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 600px) { .page-content { padding: 30px 16px 48px; } th, td { padding-right: 11px; padding-left: 11px; } .user-modal { padding: 21px; } }
+.users-page { background: radial-gradient(ellipse at 50% -18%, #e8f4f1 0, transparent 42%), #f3f6fa; }
+.page-content { max-width: 1200px; padding-top: 48px; }
+.page-heading { margin-bottom: 4px; }
+h1 { font-size: clamp(30px, 3vw, 38px); letter-spacing: -1.5px; }
+.user-count { padding: 10px 14px; border: 1px solid #e2e9ef; border-radius: 999px; color: #52677d; background: #fff; box-shadow: 0 5px 16px rgb(22 43 67 / 4%); font-weight: 600; }
+.users-card { margin-top: 30px; border-color: #e3eaf0; border-radius: 14px; box-shadow: 0 10px 30px rgb(22 43 67 / 5%); }
+thead { background: #f7f9fb; }
+th { height: 48px; letter-spacing: .8px; }
+td { height: 70px; transition: background 140ms ease; }
+tbody tr:hover td { background: #fbfdfd; }
+.user-name { gap: 12px; }
+.user-avatar { width: 36px; height: 36px; border: 2px solid #fff; box-shadow: 0 0 0 1px #dcebe6; font-size: 12px; }
+.role-badge { padding: 6px 11px; font-size: 10px; }
+.row-actions button { width: 34px; height: 34px; border-radius: 9px; }
+.loading-state, .empty-state { min-height: 250px; }
+.user-modal { border-radius: 16px; box-shadow: 0 28px 80px rgb(10 27 44 / 24%); }
+.primary-button, .cancel-button { min-height: 42px; border-radius: 9px; }
+@media (max-width: 600px) { .page-content { padding-top: 34px; } .user-count { padding: 8px 10px; font-size: 10px; } }
