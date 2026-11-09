@@ -1,5 +1,7 @@
 package com.sumpositive.ticketing.user.entity;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 
@@ -22,6 +24,14 @@ public class User {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
+    
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'ROLE_USER'")
+    @Column(nullable = false, length = 20)
+    private Role role = Role.ROLE_USER;
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 
     public User() {}
 
