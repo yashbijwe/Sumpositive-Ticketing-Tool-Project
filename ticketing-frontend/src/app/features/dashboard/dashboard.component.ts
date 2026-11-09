@@ -157,6 +157,31 @@ import { WorkspaceHeaderComponent } from '../../shared/components/workspace-head
     @keyframes spin { to { transform: rotate(360deg); } }
     @media (max-width: 760px) { .page-content { padding: 30px 20px 48px; } .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 520px) { .page-content { padding: 25px 16px 40px; } .page-heading { align-items: flex-start; } h1 { font-size: 24px; } .primary-link { padding: 10px; font-size: 0; } .primary-link i { font-size: 13px; } .metric-card { padding: 14px; } .ticket-row { gap: 8px; padding: 0 10px; } .priority-pill { display: none; } }
+    .dashboard-page { background: radial-gradient(ellipse at 50% -18%, #e8f4f1 0, transparent 42%), #f3f6fa; }
+    .page-content { max-width: 1360px; padding-top: 48px; }
+    .eyebrow { letter-spacing: 1.8px; }
+    h1 { font-size: clamp(30px, 3vw, 38px); letter-spacing: -1.5px; }
+    .primary-link { padding: 12px 17px; border-radius: 9px; box-shadow: 0 6px 16px rgb(24 139 125 / 17%); transition: transform 160ms ease, background 160ms ease; }
+    .primary-link:hover { transform: translateY(-1px); }
+    .metrics-grid { gap: 18px; margin-top: 36px; }
+    .metric-card { position: relative; overflow: hidden; min-height: 132px; padding: 22px; border-color: #e3eaf0; border-radius: 14px; box-shadow: 0 8px 22px rgb(22 43 67 / 4%); transition: transform 160ms ease, box-shadow 160ms ease; }
+    .metric-card::after { position: absolute; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(90deg, #168b7d, #80d5bf); content: ''; opacity: .8; }
+    .metric-card:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgb(22 43 67 / 8%); }
+    .metric-icon { width: 42px; height: 42px; border-radius: 12px; }
+    .metric-card strong { font-size: 28px; letter-spacing: -1px; }
+    .recent-section { margin-top: 44px; }
+    .section-heading { margin-bottom: 18px; }
+    .section-heading h2 { font-size: 17px; letter-spacing: -.3px; }
+    .section-heading a { display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px; border-radius: 8px; transition: background 150ms ease; }
+    .section-heading a:hover { background: #e8f4f1; }
+    .ticket-list { border-color: #e3eaf0; border-radius: 14px; box-shadow: 0 10px 28px rgb(22 43 67 / 5%); }
+    .ticket-row { min-height: 76px; padding: 0 22px; transition: background 150ms ease; }
+    .ticket-row:hover { background: #f7fbfa; }
+    .ticket-mark { width: 39px; height: 39px; border-radius: 11px; }
+    .ticket-info strong { font-size: 13px; }
+    .priority-pill, .status-pill { padding: 6px 10px; font-size: 10px; }
+    .empty-state, .loading-state { border-color: #e3eaf0; border-radius: 14px; box-shadow: 0 10px 28px rgb(22 43 67 / 4%); }
+    @media (max-width: 520px) { .page-content { padding-top: 34px; } .metrics-grid { gap: 11px; margin-top: 25px; } .metric-card { min-height: 112px; padding: 14px; } .metric-icon { width: 35px; height: 35px; } .recent-section { margin-top: 32px; } .ticket-row { min-height: 68px; } }
   `
 })
 export class DashboardComponent implements OnInit {
