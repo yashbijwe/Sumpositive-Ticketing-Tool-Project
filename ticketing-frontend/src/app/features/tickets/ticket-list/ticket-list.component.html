@@ -43,12 +43,12 @@
             <option value="DONE">Done</option>
           </select>
         </label>
-        <span class="result-count">{{ filteredTickets.length }} tickets</span>
+        <span class="result-count">{{ filteredTicketCount }} tickets</span>
       </div>
 
       @if (isLoading) {
         <div class="loading-state"><span class="spinner"></span> Loading tickets...</div>
-      } @else if (filteredTickets.length === 0) {
+      } @else if (isAdmin && filteredTickets.length === 0) {
         <div class="empty-state">
           <span class="empty-icon"><i class="bi bi-inbox" aria-hidden="true"></i></span>
           <strong>{{ tickets.length ? 'No matching tickets' : 'No tickets yet' }}</strong>
@@ -58,78 +58,120 @@
           }
         </div>
       } @else {
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Ticket</th>
-                <th scope="col">Status</th>
-                <th scope="col">Priority</th>
-                <th scope="col">Assignee</th>
-                @if (isAdmin) {
-                  <th scope="col">Created by</th>
-                }
-                <th scope="col">Created date</th>
-                <th scope="col">Due date</th>
-                <th scope="col"><span class="visually-hidden">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (ticket of filteredTickets; track ticket.id) {
-                <tr>
-                  <td>
-                    <div class="ticket-title">
-                      <span class="ticket-icon"><i class="bi bi-ticket-perforated" aria-hidden="true"></i></span>
-                      <span>
-                        <strong>{{ ticket.title }}</strong>
-                        <small>#{{ ticket.id }} @if (ticket.description) { <span>·</span> {{ ticket.description }} }</small>
-                      </span>
-                    </div>
-                  </td>
-                  <td><span [class]="statusClass(ticket.status)">{{ statusLabel(ticket.status) }}</span></td>
-                  <td><span [class]="priorityClass(ticket.priority)">{{ ticket.priority }}</span></td>
-                  <td>
-                    <span class="assignee">
-                      @if (ticket.assignee) {
-                        <span class="assignee-avatar" aria-hidden="true">{{ ticket.assignee.name.slice(0, 1) }}</span>
-                        {{ ticket.assignee.name }}
-                      } @else {
-                        <span class="unassigned">Unassigned</span>
-                      }
-                    </span>
-                  </td>
-                  @if (isAdmin) {
-                    <td>
-                      <span class="assignee">
-                        @if (ticket.creatorName || ticket.creator) {
-                          <span class="assignee-avatar" aria-hidden="true">{{ (ticket.creatorName ?? ticket.creator?.name ?? '').slice(0, 1) }}</span>
-                          {{ ticket.creatorName ?? ticket.creator?.name }}
-                        } @else {
-                          <span class="unassigned">Unknown</span>
-                        }
-                      </span>
-                    </td>
-                  }
-                  <td class="due-date">{{ ticket.createdAt | date: 'mediumDate' }}</td>
-                  <td class="due-date">{{ ticket.dueDate ? (ticket.dueDate | date: 'mediumDate') : '—' }}</td>
-                  <td>
-                    <div class="row-actions">
-                      <button type="button" aria-label="Edit ticket" title="Edit ticket" (click)="openEditModal(ticket)">
-                        <i class="bi bi-pencil" aria-hidden="true"></i>
-                      </button>
-                      <button type="button" aria-label="Delete ticket" title="Delete ticket" (click)="deleteTicket(ticket)">
-                        <i class="bi bi-trash3" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        @if (isAdmin) {
+          <ng-container
+            [ngTemplateOutlet]="ticketTable"
+            [ngTemplateOutletContext]="{ $implicit: filteredTickets }"
+          />
+        } @else {
+          <section class="ticket-group" aria-labelledby="assigned-tickets-title">
+            <header class="ticket-group-heading">
+              <h2 id="assigned-tickets-title">Assigned to me</h2>
+              <span>{{ filteredAssignedTickets.length }}</span>
+            </header>
+            @if (filteredAssignedTickets.length) {
+              <ng-container
+                [ngTemplateOutlet]="ticketTable"
+                [ngTemplateOutletContext]="{ $implicit: filteredAssignedTickets }"
+              />
+            } @else {
+              <p class="group-empty">
+                {{ assignedTickets.length ? 'No matching tickets.' : 'No tickets are assigned to you.' }}
+              </p>
+            }
+          </section>
+          <section class="ticket-group" aria-labelledby="other-tickets-title">
+            <header class="ticket-group-heading">
+              <h2 id="other-tickets-title">Other tickets</h2>
+              <span>{{ filteredTickets.length }}</span>
+            </header>
+            @if (filteredTickets.length) {
+              <ng-container
+                [ngTemplateOutlet]="ticketTable"
+                [ngTemplateOutletContext]="{ $implicit: filteredTickets }"
+              />
+            } @else {
+              <p class="group-empty">
+                {{ otherTickets.length ? 'No matching tickets.' : 'No other tickets.' }}
+              </p>
+            }
+          </section>
+        }
       }
     </section>
   </div>
+
+  <ng-template #ticketTable let-ticketItems>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Ticket</th>
+            <th scope="col">Status</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Assignee</th>
+            @if (isAdmin) {
+              <th scope="col">Created by</th>
+            }
+            <th scope="col">Created date</th>
+            <th scope="col">Due date</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ticket of ticketItems; track ticket.id) {
+            <tr>
+              <td>
+                <div class="ticket-title">
+                  <span class="ticket-icon"><i class="bi bi-ticket-perforated" aria-hidden="true"></i></span>
+                  <span>
+                    <strong>{{ ticket.title }}</strong>
+                    <small>#{{ ticket.id }} @if (ticket.description) { <span>·</span> {{ ticket.description }} }</small>
+                  </span>
+                </div>
+              </td>
+              <td><span [class]="statusClass(ticket.status)">{{ statusLabel(ticket.status) }}</span></td>
+              <td><span [class]="priorityClass(ticket.priority)">{{ ticket.priority }}</span></td>
+              <td>
+                <span class="assignee">
+                  @if (ticket.assignee) {
+                    <span class="assignee-avatar" aria-hidden="true">{{ ticket.assignee.name.slice(0, 1) }}</span>
+                    {{ ticket.assignee.name }}
+                  } @else {
+                    <span class="unassigned">Unassigned</span>
+                  }
+                </span>
+              </td>
+              @if (isAdmin) {
+                <td>
+                  <span class="assignee">
+                    @if (ticket.creatorName || ticket.creator) {
+                      <span class="assignee-avatar" aria-hidden="true">{{ (ticket.creatorName ?? ticket.creator?.name ?? '').slice(0, 1) }}</span>
+                      {{ ticket.creatorName ?? ticket.creator?.name }}
+                    } @else {
+                      <span class="unassigned">Unknown</span>
+                    }
+                  </span>
+                </td>
+              }
+              <td class="due-date">{{ ticket.createdAt | date: 'mediumDate' }}</td>
+              <td class="due-date">{{ ticket.dueDate ? (ticket.dueDate | date: 'mediumDate') : '—' }}</td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" aria-label="Edit ticket" title="Edit ticket" (click)="openEditModal(ticket)">
+                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" aria-label="Delete ticket" title="Delete ticket" (click)="deleteTicket(ticket)">
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </ng-template>
 
   @if (isModalOpen) {
     <div class="modal-backdrop" (click)="closeModal()">
@@ -142,8 +184,12 @@
       >
         <header class="modal-header">
           <div>
-            <p class="eyebrow">{{ editingTicket ? 'UPDATE YOUR WORK' : 'ADD TO YOUR WORKSPACE' }}</p>
-            <h2 id="modal-title">{{ editingTicket ? 'Edit ticket' : 'Create a ticket' }}</h2>
+            <p class="eyebrow">
+              {{ isStatusOnlyEdit ? 'UPDATE YOUR PROGRESS' : editingTicket ? 'UPDATE YOUR WORK' : 'ADD TO YOUR WORKSPACE' }}
+            </p>
+            <h2 id="modal-title">
+              {{ isStatusOnlyEdit ? 'Update ticket status' : editingTicket ? 'Edit ticket' : 'Create a ticket' }}
+            </h2>
           </div>
           <button type="button" class="close-button" aria-label="Close dialog" (click)="closeModal()">
             <i class="bi bi-x-lg" aria-hidden="true"></i>
@@ -155,67 +201,76 @@
         }
 
         <form [formGroup]="ticketForm" (ngSubmit)="submitTicket()">
-          <div class="form-field">
-            <label for="ticket-title">Title <span>*</span></label>
-            <input id="ticket-title" type="text" formControlName="title" maxlength="120" placeholder="What needs to be done?" />
-            @if (ticketForm.controls.title.invalid && ticketForm.controls.title.touched) {
-              <small class="field-error">
-                @if (ticketForm.controls.title.hasError('required')) { Add a title for this ticket. }
-                @else { Keep the title to 120 characters or fewer. }
-              </small>
-            }
-          </div>
-          <div class="form-field">
-            <label for="ticket-description">Description</label>
-            <textarea id="ticket-description" formControlName="description" rows="3" maxlength="1000" placeholder="Add a few details (optional)"></textarea>
-            @if (ticketForm.controls.description.invalid && ticketForm.controls.description.touched) {
-              <small class="field-error">Keep the description to 1,000 characters or fewer.</small>
-            }
-          </div>
+          @if (isStatusOnlyEdit) {
+            <p class="status-only-ticket"><i class="bi bi-ticket-perforated" aria-hidden="true"></i> {{ editingTicket?.title }}</p>
+          } @else {
+            <div class="form-field">
+              <label for="ticket-title">Title <span>*</span></label>
+              <input id="ticket-title" type="text" formControlName="title" maxlength="120" placeholder="What needs to be done?" />
+              @if (ticketForm.controls.title.invalid && ticketForm.controls.title.touched) {
+                <small class="field-error">
+                  @if (ticketForm.controls.title.hasError('required')) { Add a title for this ticket. }
+                  @else { Keep the title to 120 characters or fewer. }
+                </small>
+              }
+            </div>
+            <div class="form-field">
+              <label for="ticket-description">Description</label>
+              <textarea id="ticket-description" formControlName="description" rows="3" maxlength="1000" placeholder="Add a few details (optional)"></textarea>
+              @if (ticketForm.controls.description.invalid && ticketForm.controls.description.touched) {
+                <small class="field-error">Keep the description to 1,000 characters or fewer.</small>
+              }
+            </div>
+          }
           <div class="form-row">
-            <div class="form-field">
-              <label for="ticket-status">Status</label>
-              <select id="ticket-status" formControlName="status">
-                @for (status of statuses; track status) {
-                  <option [value]="status">{{ statusLabel(status) }}</option>
-                }
-              </select>
-            </div>
-            <div class="form-field">
-              <label for="ticket-priority">Priority</label>
-              <select id="ticket-priority" formControlName="priority">
-                @for (priority of priorities; track priority) {
-                  <option [value]="priority">{{ priority }}</option>
-                }
-              </select>
-            </div>
-          </div>
-          <div class="form-field">
-            <label for="ticket-assignee">Assignee</label>
-            <select id="ticket-assignee" formControlName="assigneeId">
-              <option [ngValue]="null">Unassigned</option>
-              @if (isLoadingUsers) {
-                <option disabled>Loading assignees...</option>
-              }
-              @for (user of users; track user.id) {
-                <option [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
-              }
-            </select>
-            @if (usersError) {
-              <small class="field-error" role="alert">
-                {{ usersError }}
-                <button class="retry-users" type="button" (click)="loadUsers()">Retry</button>
-              </small>
+            @if (isStatusOnlyEdit) {
+              <div class="form-field">
+                <label for="ticket-status">Status</label>
+                <select id="ticket-status" formControlName="status">
+                  @for (status of statuses; track status) {
+                    <option [value]="status">{{ statusLabel(status) }}</option>
+                  }
+                </select>
+              </div>
+            } @else {
+              <div class="form-field">
+                <label for="ticket-priority">Priority</label>
+                <select id="ticket-priority" formControlName="priority">
+                  @for (priority of priorities; track priority) {
+                    <option [value]="priority">{{ priority }}</option>
+                  }
+                </select>
+              </div>
             }
           </div>
-          <div class="form-field">
-            <label for="ticket-due-date">Due date</label>
-            <input id="ticket-due-date" type="date" formControlName="dueDate" />
-          </div>
+          @if (!isStatusOnlyEdit) {
+            <div class="form-field">
+              <label for="ticket-assignee">Assignee</label>
+              <select id="ticket-assignee" formControlName="assigneeId">
+                <option [ngValue]="null">Unassigned</option>
+                @if (isLoadingUsers) {
+                  <option disabled>Loading assignees...</option>
+                }
+                @for (user of users; track user.id) {
+                  <option [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
+                }
+              </select>
+              @if (usersError) {
+                <small class="field-error" role="alert">
+                  {{ usersError }}
+                  <button class="retry-users" type="button" (click)="loadUsers()">Retry</button>
+                </small>
+              }
+            </div>
+            <div class="form-field">
+              <label for="ticket-due-date">Due date</label>
+              <input id="ticket-due-date" type="date" formControlName="dueDate" />
+            </div>
+          }
           <footer class="modal-actions">
             <button class="cancel-button" type="button" [disabled]="isSaving" (click)="closeModal()">Cancel</button>
             <button class="primary-button" type="submit" [disabled]="isSaving">
-              @if (isSaving) { Saving... } @else { {{ editingTicket ? 'Save changes' : 'Create ticket' }} }
+              @if (isSaving) { Saving... } @else { {{ isStatusOnlyEdit ? 'Update status' : editingTicket ? 'Save changes' : 'Create ticket' }} }
             </button>
           </footer>
         </form>
