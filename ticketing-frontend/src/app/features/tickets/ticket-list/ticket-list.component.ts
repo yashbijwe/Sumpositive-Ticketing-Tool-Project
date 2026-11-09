@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,7 +17,7 @@ import { WorkspaceHeaderComponent } from '../../../shared/components/workspace-h
 
 @Component({
   selector: 'app-ticket-list',
-  imports: [DatePipe, ReactiveFormsModule, WorkspaceHeaderComponent],
+  imports: [DatePipe, NgTemplateOutlet, ReactiveFormsModule, WorkspaceHeaderComponent],
   templateUrl: './ticket-list.component.html',
   styleUrl: './ticket-list.component.scss'
 })
@@ -55,9 +55,43 @@ export class TicketListComponent implements OnInit {
     return this.authService.hasRole('ROLE_ADMIN');
   }
 
+  get isStatusOnlyEdit(): boolean {
+    return (
+      !this.isAdmin &&
+      this.editingTicket?.assignee?.id === this.authService.getCurrentUser()?.id
+    );
+  }
+
+  get assignedTickets(): Ticket[] {
+    const currentUserId = this.authService.getCurrentUser()?.id;
+    return this.tickets.filter((ticket) => ticket.assignee?.id === currentUserId);
+  }
+
+  get otherTickets(): Ticket[] {
+    if (this.isAdmin) {
+      return this.tickets;
+    }
+
+    const currentUserId = this.authService.getCurrentUser()?.id;
+    return this.tickets.filter((ticket) => ticket.assignee?.id !== currentUserId);
+  }
+
   get filteredTickets(): Ticket[] {
     const query = this.searchTerm.trim().toLowerCase();
-    return this.tickets.filter((ticket) => {
+    return this.filterTickets(this.otherTickets, query);
+  }
+
+  get filteredAssignedTickets(): Ticket[] {
+    const query = this.searchTerm.trim().toLowerCase();
+    return this.filterTickets(this.assignedTickets, query);
+  }
+
+  get filteredTicketCount(): number {
+    return this.filteredTickets.length + (this.isAdmin ? 0 : this.filteredAssignedTickets.length);
+  }
+
+  private filterTickets(tickets: Ticket[], query: string): Ticket[] {
+    return tickets.filter((ticket) => {
       const matchesSearch =
         !query ||
         ticket.title.toLowerCase().includes(query) ||
@@ -175,7 +209,9 @@ export class TicketListComponent implements OnInit {
     };
     this.isSaving = true;
     const request = this.editingTicket
-      ? this.ticketService.updateTicket(this.editingTicket.id, details)
+      ? this.isStatusOnlyEdit
+        ? this.ticketService.updateStatus(this.editingTicket.id, formValue.status)
+        : this.ticketService.updateTicket(this.editingTicket.id, details)
       : this.ticketService.createTicket(details satisfies CreateTicketRequest);
 
     request.subscribe({
