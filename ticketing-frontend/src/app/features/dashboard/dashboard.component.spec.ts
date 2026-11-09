@@ -15,7 +15,7 @@ describe('DashboardComponent', () => {
       imports: [DashboardComponent],
       providers: [
         provideRouter([]),
-        { provide: AuthService, useValue: { logout: vi.fn() } },
+        { provide: AuthService, useValue: { logout: vi.fn(), hasRole: vi.fn(() => false) } },
         { provide: TicketService, useValue: ticketService }
       ]
     }).compileComponents();

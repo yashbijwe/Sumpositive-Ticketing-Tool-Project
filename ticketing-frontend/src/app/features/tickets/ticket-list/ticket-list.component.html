@@ -3,9 +3,11 @@
   <div class="page-content">
     <section class="page-heading">
       <div>
-        <p class="eyebrow">YOUR WORKSPACE</p>
-        <h1>Tickets</h1>
-        <p class="subheading">Keep every task organized and moving forward.</p>
+        <p class="eyebrow">{{ isAdmin ? 'ADMINISTRATION' : 'YOUR WORKSPACE' }}</p>
+        <h1>{{ isAdmin ? 'Workspace tickets' : 'Tickets' }}</h1>
+        <p class="subheading">
+          {{ isAdmin ? 'Review, assign, and manage tickets across all users.' : 'Keep every task organized and moving forward.' }}
+        </p>
       </div>
       <button class="primary-button" type="button" (click)="openCreateModal()">
         <i class="bi bi-plus-lg" aria-hidden="true"></i> New ticket
@@ -63,6 +65,11 @@
                 <th scope="col">Ticket</th>
                 <th scope="col">Status</th>
                 <th scope="col">Priority</th>
+                <th scope="col">Assignee</th>
+                @if (isAdmin) {
+                  <th scope="col">Created by</th>
+                }
+                <th scope="col">Created date</th>
                 <th scope="col">Due date</th>
                 <th scope="col"><span class="visually-hidden">Actions</span></th>
               </tr>
@@ -81,6 +88,29 @@
                   </td>
                   <td><span [class]="statusClass(ticket.status)">{{ statusLabel(ticket.status) }}</span></td>
                   <td><span [class]="priorityClass(ticket.priority)">{{ ticket.priority }}</span></td>
+                  <td>
+                    <span class="assignee">
+                      @if (ticket.assignee) {
+                        <span class="assignee-avatar" aria-hidden="true">{{ ticket.assignee.name.slice(0, 1) }}</span>
+                        {{ ticket.assignee.name }}
+                      } @else {
+                        <span class="unassigned">Unassigned</span>
+                      }
+                    </span>
+                  </td>
+                  @if (isAdmin) {
+                    <td>
+                      <span class="assignee">
+                        @if (ticket.creatorName || ticket.creator) {
+                          <span class="assignee-avatar" aria-hidden="true">{{ (ticket.creatorName ?? ticket.creator?.name ?? '').slice(0, 1) }}</span>
+                          {{ ticket.creatorName ?? ticket.creator?.name }}
+                        } @else {
+                          <span class="unassigned">Unknown</span>
+                        }
+                      </span>
+                    </td>
+                  }
+                  <td class="due-date">{{ ticket.createdAt | date: 'mediumDate' }}</td>
                   <td class="due-date">{{ ticket.dueDate ? (ticket.dueDate | date: 'mediumDate') : '—' }}</td>
                   <td>
                     <div class="row-actions">
@@ -159,6 +189,24 @@
                 }
               </select>
             </div>
+          </div>
+          <div class="form-field">
+            <label for="ticket-assignee">Assignee</label>
+            <select id="ticket-assignee" formControlName="assigneeId">
+              <option [ngValue]="null">Unassigned</option>
+              @if (isLoadingUsers) {
+                <option disabled>Loading assignees...</option>
+              }
+              @for (user of users; track user.id) {
+                <option [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
+              }
+            </select>
+            @if (usersError) {
+              <small class="field-error" role="alert">
+                {{ usersError }}
+                <button class="retry-users" type="button" (click)="loadUsers()">Retry</button>
+              </small>
+            }
           </div>
           <div class="form-field">
             <label for="ticket-due-date">Due date</label>

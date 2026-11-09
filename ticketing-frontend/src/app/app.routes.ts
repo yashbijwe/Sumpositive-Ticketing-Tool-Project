@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './core/guards/admin.guard';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -28,6 +29,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/board/kanban-board/kanban-board.component').then(
         (module) => module.KanbanBoardComponent
+      )
+  },
+  {
+    path: 'users',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./features/users/user-management/user-management.component').then(
+        (module) => module.UserManagementComponent
       )
   },
   { path: '**', redirectTo: 'dashboard' }

@@ -30,6 +30,9 @@ td { height: 65px; padding: 8px 15px; border-top: 1px solid #edf0f4; color: #627
 .ticket-title strong { max-width: 330px; overflow: hidden; color: #293d52; font-size: 11px; text-overflow: ellipsis; }
 .ticket-title small { max-width: 340px; overflow: hidden; color: #9aa5b0; font-size: 9px; text-overflow: ellipsis; }
 .ticket-title small span { padding: 0 3px; }
+.assignee { display: inline-flex; max-width: 180px; align-items: center; gap: 7px; overflow: hidden; color: #627285; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.assignee-avatar { display: grid; width: 23px; height: 23px; flex: 0 0 auto; place-items: center; border-radius: 50%; color: #30796d; background: #e6f3ef; font-size: 9px; font-weight: 700; }
+.unassigned { color: #9aa5b0; }
 .priority-pill, .status-pill { display: inline-flex; padding: 5px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; }
 .priority-high { color: #b94a4a; background: #fff0ef; }
 .priority-medium { color: #9a741f; background: #fff7e6; }
@@ -67,6 +70,7 @@ td { height: 65px; padding: 8px 15px; border-top: 1px solid #edf0f4; color: #627
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form-field select { padding: 0 10px; }
 .field-error { color: #b54747; font-size: 10px; }
+.retry-users { margin-left: 5px; padding: 0; border: 0; color: #a54040; background: transparent; cursor: pointer; font: inherit; font-weight: 700; text-decoration: underline; }
 .modal-error { margin: -8px 0 16px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 23px; padding-top: 16px; border-top: 1px solid #edf0f4; }
 .cancel-button { min-height: 39px; padding: 0 13px; border: 1px solid #dfe6ec; border-radius: 7px; color: #596c7f; background: #fff; cursor: pointer; font-size: 11px; font-weight: 600; }

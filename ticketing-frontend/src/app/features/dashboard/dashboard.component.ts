@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Ticket, TicketStatus } from '../../core/models/ticket.model';
+import { AuthService } from '../../core/services/auth.service';
 import { TicketService } from '../../core/services/ticket.service';
 import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
 
@@ -14,12 +15,15 @@ import { WorkspaceHeaderComponent } from '../../shared/components/workspace-head
       <div class="page-content">
         <section class="page-heading">
           <div>
-            <p class="eyebrow">YOUR WORKSPACE</p>
-            <h1>Ticket dashboard</h1>
-            <p class="subheading">A quick look at what your team is working on.</p>
+            <p class="eyebrow">{{ isAdmin ? 'ADMIN CONTROL CENTER' : 'YOUR WORKSPACE' }}</p>
+            <h1>{{ isAdmin ? 'Workspace overview' : 'Ticket dashboard' }}</h1>
+            <p class="subheading">
+              {{ isAdmin ? 'Monitor tickets and activity across your entire workspace.' : 'A quick look at what your team is working on.' }}
+            </p>
           </div>
-          <a class="primary-link" routerLink="/tickets">
-            <i class="bi bi-plus-lg" aria-hidden="true"></i> Create a ticket
+          <a class="primary-link" [routerLink]="isAdmin ? '/users' : '/tickets'">
+            <i [class]="isAdmin ? 'bi bi-people' : 'bi bi-plus-lg'" aria-hidden="true"></i>
+            {{ isAdmin ? 'Manage users' : 'Create a ticket' }}
           </a>
         </section>
 
@@ -36,7 +40,7 @@ import { WorkspaceHeaderComponent } from '../../shared/components/workspace-head
             <span class="metric-icon all-icon"><i class="bi bi-ticket-detailed" aria-hidden="true"></i></span>
             <span class="metric-label">All tickets</span>
             <strong>{{ tickets.length }}</strong>
-            <span class="metric-footnote">In your workspace</span>
+            <span class="metric-footnote">{{ isAdmin ? 'Across the workspace' : 'In your workspace' }}</span>
           </article>
           <article class="metric-card">
             <span class="metric-icon todo-icon"><i class="bi bi-circle" aria-hidden="true"></i></span>
@@ -61,8 +65,8 @@ import { WorkspaceHeaderComponent } from '../../shared/components/workspace-head
         <section class="recent-section">
           <div class="section-heading">
             <div>
-              <h2>Recent tickets</h2>
-              <p>Your latest updates, all in one place.</p>
+              <h2>{{ isAdmin ? 'Workspace tickets' : 'Recent tickets' }}</h2>
+              <p>{{ isAdmin ? 'Latest ticket activity across all users.' : 'Your latest updates, all in one place.' }}</p>
             </div>
             <a routerLink="/tickets">View all tickets <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
           </div>
@@ -156,11 +160,16 @@ import { WorkspaceHeaderComponent } from '../../shared/components/workspace-head
   `
 })
 export class DashboardComponent implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly ticketService = inject(TicketService);
   private readonly changeDetector = inject(ChangeDetectorRef);
   tickets: Ticket[] = [];
   isLoading = true;
   errorMessage = '';
+
+  get isAdmin(): boolean {
+    return this.authService.hasRole('ROLE_ADMIN');
+  }
 
   get recentTickets(): Ticket[] {
     return [...this.tickets]

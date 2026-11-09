@@ -1,12 +1,15 @@
-<header class="workspace-header">
+<header class="workspace-header" [class.admin-header]="isAdmin">
   <a class="brand" routerLink="/dashboard" aria-label="Ticketing tool dashboard">
     <span class="brand-mark"><i class="bi bi-kanban-fill" aria-hidden="true"></i></span>
     <span>Ticketing<span class="brand-light"> tool</span></span>
+    @if (isAdmin) {
+      <span class="console-tag"><i class="bi bi-shield-lock" aria-hidden="true"></i> ADMIN CONSOLE</span>
+    }
   </a>
 
   <nav class="main-nav" aria-label="Main navigation">
     <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      <i class="bi bi-grid-1x2" aria-hidden="true"></i> Dashboard
+      <i class="bi bi-grid-1x2" aria-hidden="true"></i> {{ isAdmin ? 'Overview' : 'Dashboard' }}
     </a>
     <a routerLink="/tickets" routerLinkActive="active">
       <i class="bi bi-ticket-detailed" aria-hidden="true"></i> Tickets
@@ -14,6 +17,13 @@
     <a routerLink="/board" routerLinkActive="active">
       <i class="bi bi-kanban" aria-hidden="true"></i> Board
     </a>
+    @if (currentUser$ | async; as user) {
+      @if (user.role === 'ROLE_ADMIN') {
+        <a routerLink="/users" routerLinkActive="active">
+          <i class="bi bi-people" aria-hidden="true"></i> Users
+        </a>
+      }
+    }
   </nav>
 
   <div class="account-actions">
@@ -45,6 +55,7 @@
             </div>
             <p><i class="bi bi-envelope" aria-hidden="true"></i> {{ user.email }}</p>
             <p><i class="bi bi-person-badge" aria-hidden="true"></i> User ID: {{ user.id }}</p>
+            <p><i class="bi bi-shield-check" aria-hidden="true"></i> {{ user.role === 'ROLE_ADMIN' ? 'Administrator' : 'User' }}</p>
           </section>
         }
       </div>

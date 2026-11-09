@@ -5,6 +5,10 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest extends LoginRequest {
+  name: string;
+}
+
 export interface AuthResponse {
   token: string;
   tokenType: string;
