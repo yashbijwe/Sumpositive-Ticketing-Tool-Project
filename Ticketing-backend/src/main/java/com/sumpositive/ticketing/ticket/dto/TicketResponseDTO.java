@@ -16,6 +16,8 @@ public record TicketResponseDTO(
         TicketStatus status,
         TicketPriority priority,
         UserSummaryDTO assignee,
+        UserSummaryDTO creator,
+        String creatorName,
         LocalDate dueDate,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
