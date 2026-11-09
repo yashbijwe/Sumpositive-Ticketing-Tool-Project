@@ -32,6 +32,9 @@ public class Ticket {
     @JoinColumn(name = "creator_id")
     private User creator;
 
+    @Column(name = "creator_name")
+    private String creatorName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id")
     private User assignee;
@@ -73,6 +76,8 @@ public class Ticket {
     public void setPriority(TicketPriority priority) { this.priority = priority; }
     public User getCreator() { return creator; }
     public void setCreator(User creator) { this.creator = creator; }
+    public String getCreatorName() { return creatorName; }
+    public void setCreatorName(String creatorName) { this.creatorName = creatorName; }
     public User getAssignee() { return assignee; }
     public void setAssignee(User assignee) { this.assignee = assignee; }
     public LocalDate getDueDate() { return dueDate; }
