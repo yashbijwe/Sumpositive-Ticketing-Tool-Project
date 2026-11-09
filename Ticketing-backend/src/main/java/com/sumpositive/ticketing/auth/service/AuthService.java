@@ -1,12 +1,5 @@
 package com.sumpositive.ticketing.auth.service;
 
-import com.sumpositive.ticketing.auth.dto.AuthResponseDTO;
-import com.sumpositive.ticketing.auth.dto.LoginRequestDTO;
-import com.sumpositive.ticketing.common.exception.ResourceNotFoundException;
-import com.sumpositive.ticketing.security.JwtService;
-import com.sumpositive.ticketing.user.dto.UserSummaryDTO;
-import com.sumpositive.ticketing.user.entity.User;
-import com.sumpositive.ticketing.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,6 +8,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.sumpositive.ticketing.auth.dto.AuthResponseDTO;
+import com.sumpositive.ticketing.auth.dto.LoginRequestDTO;
+import com.sumpositive.ticketing.auth.dto.RegisterRequestDTO;
+import com.sumpositive.ticketing.common.exception.ResourceNotFoundException;
+import com.sumpositive.ticketing.common.exception.ValidationException;
+import com.sumpositive.ticketing.security.JwtService;
+import com.sumpositive.ticketing.user.dto.UserSummaryDTO;
+import com.sumpositive.ticketing.user.entity.User;
+import com.sumpositive.ticketing.user.repository.UserRepository;
 
 @Service
 public class AuthService {
@@ -36,6 +39,28 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+    }
+    
+    @Transactional
+    public AuthResponseDTO register(RegisterRequestDTO request) {
+        String normalizedEmail = request.email().trim().toLowerCase();
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new ValidationException("An account with this email already exists");
+        }
+
+        User newUser = new User();
+        newUser.setName(request.name().trim());
+        newUser.setEmail(normalizedEmail);
+        newUser.setPasswordHash(passwordEncoder.encode(request.password()));
+
+        User savedUser = userRepository.save(newUser);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getEmail());
+        String token = jwtService.generateToken(userDetails);
+
+        UserSummaryDTO userSummary = new UserSummaryDTO(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.getRole());
+        return AuthResponseDTO.of(token, userSummary);
     }
 
     @Transactional(readOnly = true)
@@ -65,7 +90,7 @@ public class AuthService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtService.generateToken(userDetails);
 
-        UserSummaryDTO userSummary = new UserSummaryDTO(user.getId(), user.getName(), user.getEmail());
+        UserSummaryDTO userSummary = new UserSummaryDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
         return AuthResponseDTO.of(token, userSummary);
     }
 
@@ -73,6 +98,6 @@ public class AuthService {
     public UserSummaryDTO getCurrentUser(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-        return new UserSummaryDTO(user.getId(), user.getName(), user.getEmail());
+        return new UserSummaryDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
     }
 }  
