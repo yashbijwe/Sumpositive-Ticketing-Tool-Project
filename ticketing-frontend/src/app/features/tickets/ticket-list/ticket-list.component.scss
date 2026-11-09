@@ -11,6 +11,11 @@ h1 { font-size: 28px; letter-spacing: -1px; }
 .primary-button:disabled { cursor: wait; opacity: .7; }
 .list-card { margin-top: 29px; overflow: hidden; border: 1px solid #e7ecf1; border-radius: 10px; background: #fff; }
 .list-toolbar { display: flex; min-height: 69px; align-items: center; gap: 18px; padding: 12px 19px; border-bottom: 1px solid #edf0f4; }
+.ticket-group + .ticket-group { border-top: 1px solid #edf0f4; }
+.ticket-group-heading { display: flex; min-height: 48px; align-items: center; gap: 9px; padding: 0 20px; }
+.ticket-group-heading h2 { font-size: 12px; }
+.ticket-group-heading span { display: inline-flex; min-width: 20px; height: 20px; align-items: center; justify-content: center; padding: 0 6px; border-radius: 10px; color: #527268; background: #eaf6f2; font-size: 10px; font-weight: 700; }
+.group-empty { margin: 0; padding: 18px 20px; border-top: 1px solid #edf0f4; color: #8391a0; font-size: 11px; }
 .search-box { display: flex; width: min(320px, 42vw); min-height: 37px; align-items: center; gap: 9px; padding: 0 11px; border: 1px solid #e2e8ee; border-radius: 7px; color: #92a0ad; }
 .search-box:focus-within { border-color: #69b4a8; box-shadow: 0 0 0 3px rgb(39 152 135 / 9%); }
 .search-box input { width: 100%; border: 0; outline: 0; color: #293d52; background: transparent; font-size: 11px; }
@@ -62,6 +67,8 @@ td { height: 65px; padding: 8px 15px; border-top: 1px solid #edf0f4; color: #627
 .close-button:hover { color: #293d52; background: #f1f4f7; }
 .form-field { display: grid; gap: 7px; margin-bottom: 16px; }
 .form-field label { color: #394e63; font-size: 11px; font-weight: 700; }
+.status-only-ticket { display: flex; align-items: center; gap: 9px; margin: 0 0 18px; padding: 12px 14px; border: 1px solid #e6edf1; border-radius: 9px; color: #394e63; background: #f7f9fb; font-size: 12px; font-weight: 600; }
+.status-only-ticket i { color: #188b7d; }
 .form-field label span { color: #c24d4d; }
 .form-field input, .form-field textarea, .form-field select { width: 100%; min-height: 39px; padding: 9px 11px; border: 1px solid #dfe6ec; border-radius: 7px; outline: none; color: #293d52; background: #fff; font-size: 11px; }
 .form-field textarea { resize: vertical; }
