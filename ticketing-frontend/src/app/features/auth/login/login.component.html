@@ -21,9 +21,11 @@
 
     <div class="login-card">
       <div class="form-intro">
-        <span class="eyebrow form-eyebrow">WELCOME BACK</span>
-        <h2>Sign in to your account</h2>
-        <p>Enter your details below to continue to your workspace.</p>
+        <span class="eyebrow form-eyebrow">{{ isRegisterMode ? 'GET STARTED' : 'WELCOME BACK' }}</span>
+        <h2>{{ isRegisterMode ? 'Create your account' : 'Sign in to your account' }}</h2>
+        <p>
+          {{ isRegisterMode ? 'Create an account to start organizing your team’s work.' : 'Enter your details below to continue to your workspace.' }}
+        </p>
       </div>
 
       <div class="error-message" role="alert" [hidden]="!errorMessage">
@@ -32,6 +34,39 @@
       </div>
 
       <form [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+        @if (isRegisterMode) {
+          <div class="field-group">
+            <label for="name">Full name</label>
+            <div
+              class="input-wrap"
+              [class.input-invalid]="loginForm.controls.name.invalid && loginForm.controls.name.touched"
+            >
+              <i class="bi bi-person" aria-hidden="true"></i>
+              <input
+                id="name"
+                type="text"
+                formControlName="name"
+                placeholder="Your full name"
+                autocomplete="name"
+                maxlength="100"
+                [attr.aria-invalid]="loginForm.controls.name.invalid && loginForm.controls.name.touched"
+                [attr.aria-describedby]="loginForm.controls.name.invalid && loginForm.controls.name.touched ? 'name-error' : null"
+              />
+            </div>
+            @if (loginForm.controls.name.invalid && loginForm.controls.name.touched) {
+              <span class="field-error" id="name-error">
+                @if (loginForm.controls.name.hasError('required')) {
+                  Please enter your name.
+                } @else if (loginForm.controls.name.hasError('minlength')) {
+                  Name must be at least 2 characters.
+                } @else {
+                  Name must be 100 characters or fewer.
+                }
+              </span>
+            }
+          </div>
+        }
+
         <div class="field-group">
           <label for="email">Work email</label>
           <div
@@ -77,8 +112,9 @@
               id="password"
               [type]="showPassword ? 'text' : 'password'"
               formControlName="password"
-              placeholder="Enter your password"
-              autocomplete="current-password"
+              [placeholder]="isRegisterMode ? 'Create a password' : 'Enter your password'"
+              [attr.autocomplete]="isRegisterMode ? 'new-password' : 'current-password'"
+              [attr.minlength]="isRegisterMode ? 6 : null"
               [attr.aria-invalid]="loginForm.controls.password.invalid && loginForm.controls.password.touched"
               [attr.aria-describedby]="
                 loginForm.controls.password.invalid && loginForm.controls.password.touched
@@ -96,19 +132,33 @@
             </button>
           </div>
           @if (loginForm.controls.password.invalid && loginForm.controls.password.touched) {
-            <span class="field-error" id="password-error">Please enter your password.</span>
+            <span class="field-error" id="password-error">
+              @if (loginForm.controls.password.hasError('required')) {
+                Please enter your password.
+              } @else {
+                Password must be at least 6 characters.
+              }
+            </span>
           }
         </div>
 
         <button class="submit-button" type="submit" [disabled]="isSubmitting">
           @if (isSubmitting) {
             <span class="spinner" aria-hidden="true"></span>
-            Signing in...
+            {{ isRegisterMode ? 'Creating account...' : 'Signing in...' }}
           } @else {
-            Sign in <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            {{ isRegisterMode ? 'Create account' : 'Sign in' }}
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
           }
         </button>
       </form>
+
+      <p class="mode-switch">
+        {{ isRegisterMode ? 'Already have an account?' : 'New to Ticketing Tool?' }}
+        <button type="button" (click)="toggleMode()">
+          {{ isRegisterMode ? 'Sign in' : 'Create an account' }}
+        </button>
+      </p>
 
       <p class="secure-note">
         <i class="bi bi-shield-check" aria-hidden="true"></i>

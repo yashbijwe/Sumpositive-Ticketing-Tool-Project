@@ -10,6 +10,8 @@ export interface Ticket {
   status: TicketStatus;
   priority: TicketPriority;
   assignee?: UserSummary | null;
+  creator?: UserSummary | null;
+  creatorName?: string | null;
   dueDate?: string | null;
   createdAt: string;
   updatedAt: string;

@@ -9,7 +9,10 @@ import {
   TicketStatus,
   UpdateTicketRequest
 } from '../../../core/models/ticket.model';
+import { UserSummary } from '../../../core/models/user.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { TicketService } from '../../../core/services/ticket.service';
+import { UserService } from '../../../core/services/user.service';
 import { WorkspaceHeaderComponent } from '../../../shared/components/workspace-header/workspace-header.component';
 
 @Component({
@@ -21,7 +24,9 @@ import { WorkspaceHeaderComponent } from '../../../shared/components/workspace-h
 export class TicketListComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly authService = inject(AuthService);
   private readonly ticketService = inject(TicketService);
+  private readonly userService = inject(UserService);
   readonly statuses: TicketStatus[] = ['TO_DO', 'IN_PROGRESS', 'DONE'];
   readonly priorities: TicketPriority[] = ['LOW', 'MEDIUM', 'HIGH'];
   readonly ticketForm = this.formBuilder.nonNullable.group({
@@ -29,18 +34,26 @@ export class TicketListComponent implements OnInit {
     description: ['', Validators.maxLength(1000)],
     status: this.formBuilder.nonNullable.control<TicketStatus>('TO_DO'),
     priority: this.formBuilder.nonNullable.control<TicketPriority>('MEDIUM'),
+    assigneeId: this.formBuilder.control<number | null>(null),
     dueDate: ['']
   });
 
   tickets: Ticket[] = [];
+  users: UserSummary[] = [];
   searchTerm = '';
   statusFilter: 'ALL' | TicketStatus = 'ALL';
   isLoading = true;
   isSaving = false;
   errorMessage = '';
   modalError = '';
+  usersError = '';
+  isLoadingUsers = false;
   isModalOpen = false;
   editingTicket: Ticket | null = null;
+
+  get isAdmin(): boolean {
+    return this.authService.hasRole('ROLE_ADMIN');
+  }
 
   get filteredTickets(): Ticket[] {
     const query = this.searchTerm.trim().toLowerCase();
@@ -73,6 +86,24 @@ export class TicketListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTickets();
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.isLoadingUsers = true;
+    this.usersError = '';
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+        this.isLoadingUsers = false;
+        this.changeDetector.markForCheck();
+      },
+      error: () => {
+        this.usersError = 'Could not load assignees. Please try again.';
+        this.isLoadingUsers = false;
+        this.changeDetector.markForCheck();
+      }
+    });
   }
 
   loadTickets(): void {
@@ -100,6 +131,7 @@ export class TicketListComponent implements OnInit {
       description: '',
       status: 'TO_DO',
       priority: 'MEDIUM',
+      assigneeId: null,
       dueDate: ''
     });
     this.isModalOpen = true;
@@ -113,6 +145,7 @@ export class TicketListComponent implements OnInit {
       description: ticket.description ?? '',
       status: ticket.status,
       priority: ticket.priority,
+      assigneeId: ticket.assignee?.id ?? null,
       dueDate: ticket.dueDate?.slice(0, 10) ?? ''
     });
     this.isModalOpen = true;
@@ -137,6 +170,7 @@ export class TicketListComponent implements OnInit {
       description: formValue.description.trim() || undefined,
       status: formValue.status,
       priority: formValue.priority,
+      assigneeId: formValue.assigneeId,
       dueDate: formValue.dueDate || null
     };
     this.isSaving = true;

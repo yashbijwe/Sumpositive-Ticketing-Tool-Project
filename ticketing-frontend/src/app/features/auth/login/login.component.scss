@@ -305,6 +305,28 @@ h2 {
   font-size: 10px;
 }
 
+.mode-switch {
+  margin: 20px 0 0;
+  color: #7d8b9b;
+  font-size: 11px;
+  text-align: center;
+}
+
+.mode-switch button {
+  padding: 0;
+  border: 0;
+  color: #188b7d;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.mode-switch button:hover {
+  color: #13796e;
+  text-decoration: underline;
+}
+
 .secure-note i {
   color: #329888;
   font-size: 13px;

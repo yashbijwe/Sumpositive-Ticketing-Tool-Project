@@ -13,6 +13,42 @@
   background: #fff;
 }
 
+.workspace-header.admin-header {
+  min-height: 78px;
+  border-bottom: 3px solid #188b7d;
+  background: #142b43;
+}
+
+.admin-header .brand,
+.admin-header .main-nav a,
+.admin-header .account-label,
+.admin-header .logout-button {
+  color: #e7eef6;
+}
+
+.admin-header .brand-light {
+  color: #afc0d2;
+}
+
+.admin-header .brand-mark {
+  color: #fff;
+  background: #188b7d;
+}
+
+.console-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  padding: 6px 8px;
+  border: 1px solid rgb(126 218 197 / 35%);
+  border-radius: 5px;
+  color: #91e0ca;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .8px;
+}
+
 .brand {
   display: inline-flex;
   flex: 0 0 auto;
@@ -63,6 +99,12 @@
 .main-nav a.active {
   border-bottom-color: #188b7d;
   color: #177d72;
+}
+
+.admin-header .main-nav a:hover,
+.admin-header .main-nav a.active {
+  border-bottom-color: #72d6bd;
+  color: #91e0ca;
 }
 
 .account-actions {
@@ -172,6 +214,16 @@
 .logout-button:hover {
   border-color: #d3e6e2;
   color: #177d72;
+}
+
+.admin-header .logout-button {
+  border-color: rgb(255 255 255 / 22%);
+  background: rgb(255 255 255 / 7%);
+}
+
+.admin-header .logout-button:hover {
+  border-color: #72d6bd;
+  color: #91e0ca;
 }
 
 @media (max-width: 760px) {
