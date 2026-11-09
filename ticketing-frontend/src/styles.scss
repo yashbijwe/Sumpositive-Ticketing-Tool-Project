@@ -2,11 +2,27 @@
   color-scheme: light;
   font-family: 'Segoe UI', sans-serif;
   color: #15253b;
-  background: #f5f7fb;
+  background: #f3f6fa;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-ink: #172b43;
+  --color-muted: #78899b;
+  --color-primary: #168b7d;
+  --color-primary-dark: #11766b;
+  --color-border: #e4eaf0;
+  --shadow-card: 0 12px 32px rgb(22 43 67 / 6%);
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -14,10 +30,147 @@ body {
   min-height: 100vh;
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #f5f7fb;
+  background: #f3f6fa;
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgb(22 139 125 / 32%);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: #10243b;
+  background: #c9eee4;
+}
+
+:root .tickets-page {
+  background: radial-gradient(ellipse at 50% -18%, #e8f4f1 0, transparent 42%), #f3f6fa;
+}
+
+:root .tickets-page .page-content {
+  max-width: 1360px;
+  padding-top: 48px;
+}
+
+:root .tickets-page .page-heading {
+  margin-bottom: 4px;
+}
+
+:root .tickets-page h1 {
+  font-size: clamp(30px, 3vw, 38px);
+  letter-spacing: -1.5px;
+}
+
+:root .tickets-page .list-card {
+  margin-top: 30px;
+  border-color: #e3eaf0;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgb(22 43 67 / 5%);
+}
+
+:root .tickets-page .list-toolbar {
+  min-height: 78px;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, #fff, #fcfdfd);
+}
+
+:root .tickets-page .search-box {
+  min-height: 42px;
+  border-radius: 9px;
+}
+
+:root .tickets-page .filter-label select {
+  min-height: 42px;
+  border-radius: 9px;
+}
+
+:root .tickets-page .ticket-group-heading {
+  min-height: 56px;
+  padding: 0 22px;
+  background: #fbfcfd;
+}
+
+:root .tickets-page .ticket-group-heading h2 {
+  font-size: 13px;
+}
+
+:root .tickets-page .ticket-group-heading span {
+  min-width: 23px;
+  height: 23px;
+}
+
+:root .tickets-page thead {
+  background: #f7f9fb;
+}
+
+:root .tickets-page th {
+  height: 48px;
+  letter-spacing: .8px;
+}
+
+:root .tickets-page td {
+  height: 72px;
+  transition: background 140ms ease;
+}
+
+:root .tickets-page tbody tr:hover td {
+  background: #fbfdfd;
+}
+
+:root .tickets-page .ticket-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+}
+
+:root .tickets-page .ticket-title strong {
+  font-size: 12px;
+}
+
+:root .tickets-page .priority-pill,
+:root .tickets-page .status-pill {
+  padding: 6px 10px;
+  font-size: 10px;
+}
+
+:root .tickets-page .row-actions button {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+
+:root .tickets-page .ticket-modal {
+  border-radius: 16px;
+  box-shadow: 0 28px 80px rgb(10 27 44 / 24%);
+}
+
+:root .tickets-page .cancel-button,
+:root .tickets-page .primary-button {
+  min-height: 42px;
+  border-radius: 9px;
+}
+
+@media (max-width: 520px) {
+  :root .tickets-page .page-content {
+    padding-top: 34px;
+  }
+
+  :root .tickets-page .list-toolbar {
+    padding: 12px;
+  }
+
+  :root .tickets-page .ticket-group-heading {
+    padding: 0 14px;
+  }
 }
