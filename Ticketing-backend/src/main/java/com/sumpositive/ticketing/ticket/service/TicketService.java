@@ -8,6 +8,7 @@ import com.sumpositive.ticketing.ticket.entity.TicketPriority;
 import com.sumpositive.ticketing.ticket.entity.TicketStatus;
 import com.sumpositive.ticketing.ticket.mapper.TicketMapper;
 import com.sumpositive.ticketing.ticket.repository.TicketRepository;
+import com.sumpositive.ticketing.user.entity.Role;
 import com.sumpositive.ticketing.user.entity.User;
 import com.sumpositive.ticketing.user.repository.UserRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -46,29 +47,36 @@ public class TicketService {
         ticket.setStatus(request.status() != null ? request.status() : TicketStatus.TO_DO);
         ticket.setPriority(request.priority() != null ? request.priority() : TicketPriority.MEDIUM);
         ticket.setDueDate(request.dueDate());
-        ticket.setCreator(currentUser); // Associate with logged in user
+        ticket.setCreator(currentUser);
+        ticket.setCreatorName(currentUser.getName());
 
+        // Can assign to any valid registered user
         if (request.assigneeId() != null) {
             User assignee = userRepository.findById(request.assigneeId())
                     .orElseThrow(() -> new ValidationException("Assignee not found with ID: " + request.assigneeId()));
             ticket.setAssignee(assignee);
         }
 
-        Ticket savedTicket = ticketRepository.save(ticket);
-        return ticketMapper.toResponseDTO(savedTicket);
+        return ticketMapper.toResponseDTO(
+                ticketRepository.save(ticket),
+                currentUser.getRole() == Role.ROLE_ADMIN
+        );
     }
 
     @Transactional(readOnly = true)
     public List<TicketResponseDTO> getTickets(TicketStatus status, TicketPriority priority, Long assigneeId, String currentUserEmail) {
         User currentUser = getAuthenticatedUser(currentUserEmail);
+        boolean isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
 
         Specification<Ticket> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Show tickets where current user is either the creator OR the assignee
-            Predicate isCreator = cb.equal(root.get("creator").get("id"), currentUser.getId());
-            Predicate isAssignee = cb.equal(root.get("assignee").get("id"), currentUser.getId());
-            predicates.add(cb.or(isCreator, isAssignee));
+            // If not admin, restrict to tickets created by or assigned to current user
+            if (!isAdmin) {
+                Predicate isCreator = cb.equal(root.get("creator").get("id"), currentUser.getId());
+                Predicate isAssignee = cb.equal(root.get("assignee").get("id"), currentUser.getId());
+                predicates.add(cb.or(isCreator, isAssignee));
+            }
 
             if (status != null) {
                 predicates.add(cb.equal(root.get("status"), status));
@@ -85,7 +93,7 @@ public class TicketService {
         };
 
         return ticketRepository.findAll(spec).stream()
-                .map(ticketMapper::toResponseDTO)
+                .map(ticket -> ticketMapper.toResponseDTO(ticket, isAdmin))
                 .toList();
     }
 
@@ -95,8 +103,8 @@ public class TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
 
-        validateOwnership(ticket, currentUser);
-        return ticketMapper.toResponseDTO(ticket);
+        validateAccess(ticket, currentUser);
+        return ticketMapper.toResponseDTO(ticket, currentUser.getRole() == Role.ROLE_ADMIN);
     }
 
     @Transactional
@@ -105,7 +113,7 @@ public class TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
 
-        validateOwnership(ticket, currentUser);
+        validateAccess(ticket, currentUser);
 
         ticket.setTitle(request.title().trim());
         ticket.setDescription(request.description() != null ? request.description().trim() : null);
@@ -113,6 +121,7 @@ public class TicketService {
         ticket.setPriority(request.priority());
         ticket.setDueDate(request.dueDate());
 
+        // Assign or reassign to any registered user
         if (request.assigneeId() != null) {
             User assignee = userRepository.findById(request.assigneeId())
                     .orElseThrow(() -> new ValidationException("Assignee not found with ID: " + request.assigneeId()));
@@ -121,8 +130,10 @@ public class TicketService {
             ticket.setAssignee(null);
         }
 
-        Ticket updatedTicket = ticketRepository.save(ticket);
-        return ticketMapper.toResponseDTO(updatedTicket);
+        return ticketMapper.toResponseDTO(
+                ticketRepository.save(ticket),
+                currentUser.getRole() == Role.ROLE_ADMIN
+        );
     }
 
     @Transactional
@@ -131,11 +142,12 @@ public class TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
 
-        validateOwnership(ticket, currentUser);
-
+        validateAccess(ticket, currentUser);
         ticket.setStatus(request.status());
-        Ticket updatedTicket = ticketRepository.save(ticket);
-        return ticketMapper.toResponseDTO(updatedTicket);
+        return ticketMapper.toResponseDTO(
+                ticketRepository.save(ticket),
+                currentUser.getRole() == Role.ROLE_ADMIN
+        );
     }
 
     @Transactional
@@ -144,11 +156,14 @@ public class TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
 
-        validateOwnership(ticket, currentUser);
+        validateAccess(ticket, currentUser);
         ticketRepository.delete(ticket);
     }
 
-    private void validateOwnership(Ticket ticket, User currentUser) {
+    private void validateAccess(Ticket ticket, User currentUser) {
+        if (currentUser.getRole() == Role.ROLE_ADMIN) {
+            return; // Admins have full access to view, edit, reassign, or delete
+        }
         boolean isCreator = ticket.getCreator() != null && ticket.getCreator().getId().equals(currentUser.getId());
         boolean isAssignee = ticket.getAssignee() != null && ticket.getAssignee().getId().equals(currentUser.getId());
 
