@@ -1,0 +1,56 @@
+<main class="profile-page">
+  <app-workspace-header />
+  <div class="page-content">
+    <a class="back-link" routerLink="/dashboard">
+      <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to dashboard
+    </a>
+    <section class="page-heading">
+      <p class="eyebrow">ACCOUNT SETTINGS</p>
+      <h1>Your profile</h1>
+      <p class="subheading">Update the name and email address associated with your account.</p>
+    </section>
+
+    <section class="profile-card" aria-labelledby="profile-form-title">
+      <div class="card-heading">
+        <span class="profile-icon"><i class="bi bi-person" aria-hidden="true"></i></span>
+        <div>
+          <h2 id="profile-form-title">Personal information</h2>
+          <p>Your role and account ID are managed by your workspace.</p>
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <div class="message error-message" role="alert">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i> {{ errorMessage }}
+        </div>
+      }
+      @if (successMessage) {
+        <div class="message success-message" role="status">
+          <i class="bi bi-check-circle" aria-hidden="true"></i> {{ successMessage }}
+        </div>
+      }
+
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="form-field">
+          <label for="profile-name">Full name</label>
+          <input id="profile-name" type="text" formControlName="name" maxlength="100" autocomplete="name" />
+          @if (profileForm.controls.name.invalid && profileForm.controls.name.touched) {
+            <small class="field-error">Name must be between 2 and 100 characters.</small>
+          }
+        </div>
+        <div class="form-field">
+          <label for="profile-email">Email address</label>
+          <input id="profile-email" type="email" formControlName="email" autocomplete="email" />
+          @if (profileForm.controls.email.invalid && profileForm.controls.email.touched) {
+            <small class="field-error">Enter a valid email address.</small>
+          }
+        </div>
+        <footer class="form-actions">
+          <button class="save-button" type="submit" [disabled]="isSaving">
+            @if (isSaving) { Saving... } @else { Save changes }
+          </button>
+        </footer>
+      </form>
+    </section>
+  </div>
+</main>

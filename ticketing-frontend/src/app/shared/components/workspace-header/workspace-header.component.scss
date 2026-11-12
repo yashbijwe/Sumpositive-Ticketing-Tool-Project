@@ -127,20 +127,15 @@
   gap: 18px;
 }
 
-.profile-menu {
-  position: relative;
-}
-
 .account-label {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   padding: 8px 0;
-  border: 0;
   color: #68798b;
   background: transparent;
-  cursor: pointer;
   font-size: 11px;
+  text-decoration: none;
 }
 
 .account-label i {
@@ -152,62 +147,8 @@
   color: #177d72;
 }
 
-.account-label .profile-chevron {
-  color: #8492a1;
-  font-size: 9px;
-}
-
-.profile-card {
-  position: absolute;
-  z-index: 10;
-  top: calc(100% + 8px);
-  right: 0;
-  width: 260px;
-  padding: 16px;
-  border: 1px solid #e3e9ef;
-  border-radius: 9px;
-  background: #fff;
-  box-shadow: 0 10px 28px rgb(23 47 73 / 14%);
-}
-
-.profile-card-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  color: #26394e;
-  font-size: 13px;
-}
-
-.profile-close {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border: 0;
-  border-radius: 6px;
-  color: #68798b;
-  background: transparent;
-  cursor: pointer;
-}
-
-.profile-close:hover {
+.account-label.profile-active {
   color: #177d72;
-  background: #f0f7f5;
-}
-
-.profile-card p {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 12px 0 0;
-  color: #68798b;
-  font-size: 11px;
-  overflow-wrap: anywhere;
-}
-
-.profile-card p i {
-  color: #188b7d;
 }
 
 .logout-button {
@@ -272,10 +213,6 @@
 
   .logout-button span {
     display: none;
-  }
-
-  .profile-card {
-    width: min(260px, calc(100vw - 32px));
   }
 
   .main-nav a {

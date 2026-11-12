@@ -1,0 +1,28 @@
+:host { display: block; min-height: 100vh; }
+.profile-page { min-height: 100vh; background: radial-gradient(ellipse at 50% -18%, #e8f4f1 0, transparent 42%), #f3f6fa; }
+.page-content { max-width: 860px; margin: 0 auto; padding: 38px 32px 64px; }
+.back-link { display: inline-flex; align-items: center; gap: 8px; color: #617589; font-size: 11px; font-weight: 600; text-decoration: none; }
+.back-link:hover { color: #177d72; }
+.page-heading { margin-top: 30px; }
+.eyebrow { margin: 0 0 8px; color: #188b7d; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; }
+h1, h2 { margin: 0; color: #182b42; font-family: 'Segoe UI', sans-serif; font-weight: 700; }
+h1 { font-size: clamp(30px, 3vw, 38px); letter-spacing: -1.5px; }
+.subheading { margin: 8px 0 0; color: #8290a0; font-size: 12px; }
+.profile-card { margin-top: 27px; padding: 27px; border: 1px solid #e3eaf0; border-radius: 14px; background: #fff; box-shadow: 0 10px 30px rgb(22 43 67 / 5%); }
+.card-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #edf0f4; }
+.profile-icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; color: #188b7d; background: #eaf6f2; font-size: 18px; }
+h2 { font-size: 15px; }
+.card-heading p { margin: 5px 0 0; color: #8290a0; font-size: 11px; }
+.form-field { display: grid; gap: 8px; margin-bottom: 19px; }
+.form-field label { color: #394e63; font-size: 11px; font-weight: 700; }
+.form-field input { width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid #dfe6ec; border-radius: 8px; outline: none; color: #293d52; background: #fff; font-size: 12px; }
+.form-field input:focus { border-color: #69b4a8; box-shadow: 0 0 0 3px rgb(39 152 135 / 9%); }
+.field-error { color: #b54747; font-size: 10px; }
+.message { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; padding: 11px 12px; border: 1px solid; border-radius: 8px; font-size: 11px; }
+.error-message { border-color: #f1cccc; color: #a54040; background: #fff4f3; }
+.success-message { border-color: #cce8dd; color: #247761; background: #f0faf6; }
+.form-actions { display: flex; justify-content: flex-end; margin-top: 25px; padding-top: 18px; border-top: 1px solid #edf0f4; }
+.save-button { min-height: 42px; padding: 0 16px; border: 0; border-radius: 9px; color: #fff; background: #188b7d; cursor: pointer; font-size: 11px; font-weight: 700; }
+.save-button:hover:not(:disabled) { background: #13796e; }
+.save-button:disabled { cursor: wait; opacity: .6; }
+@media (max-width: 600px) { .page-content { padding: 28px 16px 48px; } .profile-card { padding: 21px; } .page-heading { margin-top: 25px; } }

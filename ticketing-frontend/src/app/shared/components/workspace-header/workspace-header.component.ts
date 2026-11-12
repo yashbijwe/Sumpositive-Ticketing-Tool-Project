@@ -12,13 +12,8 @@ import { AuthService } from '../../../core/services/auth.service';
 export class WorkspaceHeaderComponent {
   readonly authService = inject(AuthService);
   readonly currentUser$ = this.authService.currentUser$;
-  isProfileOpen = false;
 
   get isAdmin(): boolean {
     return this.authService.hasRole('ROLE_ADMIN');
-  }
-
-  toggleProfile(): void {
-    this.isProfileOpen = !this.isProfileOpen;
   }
 }

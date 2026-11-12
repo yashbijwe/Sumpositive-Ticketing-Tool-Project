@@ -28,37 +28,15 @@
 
   <div class="account-actions">
     @if (currentUser$ | async; as user) {
-      <div class="profile-menu" (keydown.escape)="isProfileOpen = false">
-        <button
-          type="button"
+        <a
           class="account-label"
-          aria-controls="profile-details"
-          [attr.aria-expanded]="isProfileOpen"
-          (click)="toggleProfile()"
+          routerLink="/profile"
+          routerLinkActive="profile-active"
+          aria-label="Open profile and edit your information"
         >
           <i class="bi bi-person-circle" aria-hidden="true"></i>
           {{ user.name }}
-          <i class="bi bi-chevron-down profile-chevron" aria-hidden="true"></i>
-        </button>
-        @if (isProfileOpen) {
-          <section class="profile-card" id="profile-details" aria-label="User information">
-            <div class="profile-card-heading">
-              <strong>{{ user.name }}</strong>
-              <button
-                type="button"
-                class="profile-close"
-                aria-label="Close user information"
-                (click)="isProfileOpen = false"
-              >
-                <i class="bi bi-x-lg" aria-hidden="true"></i>
-              </button>
-            </div>
-            <p><i class="bi bi-envelope" aria-hidden="true"></i> {{ user.email }}</p>
-            <p><i class="bi bi-person-badge" aria-hidden="true"></i> User ID: {{ user.id }}</p>
-            <p><i class="bi bi-shield-check" aria-hidden="true"></i> {{ user.role === 'ROLE_ADMIN' ? 'Administrator' : 'User' }}</p>
-          </section>
-        }
-      </div>
+        </a>
     } @else {
       <span class="account-label">
         <i class="bi bi-person-circle" aria-hidden="true"></i>
