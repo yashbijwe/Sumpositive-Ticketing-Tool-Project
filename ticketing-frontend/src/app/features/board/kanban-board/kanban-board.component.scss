@@ -41,6 +41,22 @@ h1 { color: #182b42; font-size: 28px; letter-spacing: -1px; }
 .spinner { width: 16px; height: 16px; border: 2px solid #dbe9e6; border-top-color: #188b7d; border-radius: 50%; animation: spin 650ms linear infinite; }
 .error-banner { display: flex; align-items: center; gap: 9px; margin: 0 0 18px; padding: 12px 14px; border: 1px solid #f1cccc; border-radius: 8px; color: #a54040; background: #fff4f3; font-size: 12px; }
 .error-banner button { margin-left: auto; border: 0; color: #a54040; background: transparent; cursor: pointer; font-size: 11px; font-weight: 700; }
+.board-page { background: radial-gradient(ellipse at 50% -18%, #e8f4f1 0, transparent 42%), #f3f6fa; }
+.page-content { max-width: 1480px; padding-top: 48px; }
+.page-heading { margin-bottom: 32px; }
+.eyebrow { letter-spacing: 1.8px; }
+h1 { font-size: clamp(30px, 3vw, 38px); letter-spacing: -1.5px; }
+.board-count { padding: 11px 15px; border-radius: 10px; box-shadow: 0 5px 16px rgb(22 43 67 / 4%); }
+.board-column { padding: 0 14px 15px; border-color: #e5eaf0; border-radius: 14px; background: #edf1f6; box-shadow: inset 0 1px 0 rgb(255 255 255 / 85%); }
+.column-header { min-height: 64px; }
+.column-title h2 { font-size: 13px; }
+.column-cards { gap: 12px; }
+.ticket-card { padding: 16px; border-color: #e7edf2; border-radius: 11px; box-shadow: 0 4px 12px rgb(27 49 73 / 5%); transition: transform 160ms ease, box-shadow 160ms ease, opacity 140ms ease; }
+.ticket-card:hover:not(.is-updating) { transform: translateY(-2px); box-shadow: 0 9px 22px rgb(27 49 73 / 9%); }
+.ticket-card h3 { font-size: 13px; }
+.card-footer { margin-top: 17px; }
+.move-actions button { width: 29px; height: 29px; border-radius: 8px; }
+@media (max-width: 560px) { .page-heading { align-items: flex-start; } .board-count { padding: 8px 10px; font-size: 9px; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 900px) { .board-columns { grid-template-columns: 1fr; } .board-column { min-height: 170px; } .column-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .page-content { padding: 26px 15px 40px; } h1 { font-size: 24px; } .column-cards { grid-template-columns: 1fr; } .board-column { padding: 0 9px 10px; } }
