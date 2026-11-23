@@ -9,10 +9,10 @@ public record UserSummaryDTO(
         @Schema(description = "User unique identifier", example = "1")
         Long id,
 
-        @Schema(description = "Full name of the user", example = "Alice Dev")
+        @Schema(description = "Full name of the user", example = "name")
         String name,
 
-        @Schema(description = "Corporate email address", example = "alice@sumpositive.com")
+        @Schema(description = "Corporate email address", example = "name@gmail.com")
         String email,
         
         Role role
